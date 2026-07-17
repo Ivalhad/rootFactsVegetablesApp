@@ -15,38 +15,38 @@ export class DetectionService {
         await tf.setBackend('webgpu');
         await tf.ready();
         this.currentBackend = 'webgpu';
-        console.log('TF.js menggunakan WebGPU');
+        console.log('tf.js menggunakan WebGPU');
         return;
       } catch (e) {
-        console.warn('WebGPU gagal:', e);
+        console.warn('webGPU gagal:', e);
       }
     }
     await tf.setBackend('webgl');
     await tf.ready();
     this.currentBackend = 'webgl';
-    console.log('TF.js menggunakan WebGL');
+    console.log('tf.js menggunakan WebGL');
   }
 
   async loadModel(onProgress) {
-    onProgress?.('Mendeteksi hardware...', 10);
+    onProgress?.('mendeteksi hardware...', 10);
     await this.#setupBackend();
-    onProgress?.('Memuat metadata...', 30);
+    onProgress?.('memuat metadata...', 30);
     const metaResponse = await fetch('/model/metadata.json');
     const metadata = await metaResponse.json();
     this.labels = metadata.labels;
     this.config = metadata;
 
-    onProgress?.('Memuat model....', 60);
+    onProgress?.('memuat model...', 60);
     this.model = await tf.loadLayersModel('/model/model.json');
 
-    onProgress?.('Memproses model..', 90);
+    onProgress?.('memproses model..', 90);
     const dummyInput = tf.zeros([1, 224, 224, 3]);
     const warmup = this.model.predict(dummyInput);
     warmup.dispose();
     dummyInput.dispose();
 
-    onProgress?.('Model AI Siap', 100);
-    console.log(`Model dimuat. Labels: ${this.labels.length} kelas`);
+    onProgress?.('model AI siap', 100);
+    console.log(`model dimuat. labels: ${this.labels.length} kelas`);
   }
 
   // TODO [Basic] Lakukan prediksi pada elemen gambar yang diberikan dan kembalikan hasilnya

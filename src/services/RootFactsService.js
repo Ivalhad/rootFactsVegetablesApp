@@ -12,16 +12,86 @@ export class RootFactsService {
 
   // TODO [Basic] Muat model dan inisialisasi pipeline text2text-generation
   // TODO [Advance] Implementasikan strategi Backend Adaptive
-  async loadModel() {}
+  async #getDevice() {
+    if (typeof navigator !== 'undefined' && 'gpu' in navigator) {
+      try {
+        const adapter = await navigator.gpu.requestAdapter();
+        if (adapter) {
+          this.currentBackend = 'webgpu';
+          console.log('transformers.js pakai WebGPU');
+          return 'webgpu';
+        }
+      } catch (e) {
+        console.warn('webGPU tidak tersedia ', e);
+      }
+    }
+    this.currentBackend = 'wasm';
+    console.log('transformers.js pakai WASM');
+    return 'wasm';
+  }
+
+  async loadModel(onProgress) {
+    onProgress?.('mendeteksi hardware untuk AI...', 10);
+    const device = await this.#getDevice();
+    onProgress?.('mengunduh model...', 30);
+
+    this.generator = await pipeline(
+      'text2text-generation',
+      'Xenova/flan-t5-small',
+      {
+        dtype: 'q4',
+        device,
+        progress_callback: (progress) => {
+          if (progress.status === 'downloading') {
+            const pct = Math.round((progress.loaded / progress.total) * 60) + 30;
+            onProgress?.('mengunduh model...', pct);
+          }
+        },
+      }
+    );
+    this.isModelLoaded = true;
+    onProgress?.('model AI siap', 100);
+    console.log('model bahasa siap digunakan');
+  }
 
   // TODO [Advance] Konfigurasi tone fakta yang dihasilkan
-  setTone(tone) {}
+  setTone(tone) {
+    this.currentTone = tone;
+  }
+
+  #buildPrompt(vegetableName) {
+    const prompts = {
+      normal: `Write one interesting fun fact about ${vegetableName} in 2-3 sentences.`,
+      funny: `Write one hilariously funny and silly fun fact about ${vegetableName} in 2-3 sentences.`,
+      professional: `Write one scientific and formal fun fact about ${vegetableName} for educational purposes in 2-3 sentences.`,
+      casual: `Write one casual and friendly fun fact about ${vegetableName} as if talking to a friend in 2-3 sentences.`,
+    };
+    return prompts[this.currentTone] || prompts.normal;
+  }
 
   // TODO [Basic] Lakukan prediksi pada elemen gambar yang diberikan dan kembalikan hasilnya
   // TODO [Skilled] Konfigurasikan parameter generasi berdasarkan kebutuhan
   // TODO [Advance] Implemenasikan parameter tone untuk mengatur nada fakta yang dihasilkan
-  async generateFacts(vegetableName) {}
+  async generateFacts(vegetableName) {
+    if (!this.isReady() || this.isGenerating) return null;
+    this.isGenerating = true;
+    try {
+      const prompt = this.#buildPrompt(vegetableName);
+      const output = await this.generator(prompt, {
+        max_new_tokens: 150,
+        temperature: 0.9,
+        top_p: 0.95,
+        do_sample: true,
+      });
+      return output[0]?.generated_text || null;
+    } finally {
+
+      this.isGenerating = false;
+    }
+  }
 
   // TODO [Basic] Periksa apakah model sudah dimuat dan siap digunakan
-  isReady() {}
+  isReady() {
+    return this.generator !== null && this.isModelLoaded;
+  }
 }
