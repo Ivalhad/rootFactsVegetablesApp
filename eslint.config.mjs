@@ -25,7 +25,7 @@ export default [
         version: 'detect',
       },
     },
-    ignores: ['dist', 'node_modules'],
+    ignores: ['dist', 'node_modules', 'dev-dist'],
     rules: {
       ...pluginReact.configs.recommended.rules,
       'react/react-in-jsx-scope': 'off',
