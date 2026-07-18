@@ -14,9 +14,13 @@ function App() {
   const isRunningRef = useRef(false);
   const servicesRef = useRef(null);
   const [currentTone, setCurrentTone] = useState('normal');
+  const hasInitialized = useRef(false);
 
   // TODO [Basic] Inisialisasi layanan deteksi, kamera, dan generator fakta saat aplikasi dimuat
   useEffect(() => {
+    if (hasInitialized.current) return;
+    hasInitialized.current = true;
+
     const init = async () => {
       const detector = new DetectionService();
       const camera = new CameraService();
@@ -33,7 +37,7 @@ function App() {
         await generator.loadModel((text, pct) => {
           actions.setModelStatus(`${text}${pct < 100 ? ` ${pct}%` : ''}`);
         });
-        actions.setModelStatus('model AI Siap');
+        actions.setModelStatus('Model AI Siap');
       } catch (err) {
         console.error('gagal memuat model:', err);
         actions.setError('gagal memuat model AI. refresh halaman.');

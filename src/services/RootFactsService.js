@@ -51,7 +51,7 @@ export class RootFactsService {
       }
     );
     this.isModelLoaded = true;
-    onProgress?.('model AI siap', 100);
+    onProgress?.('Model AI Siap', 100);
     console.log('model bahasa siap digunakan');
   }
 
