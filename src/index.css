@@ -58,9 +58,12 @@ body {
 }
 
 @keyframes pulse {
-  0%, 100% {
+
+  0%,
+  100% {
     opacity: 1;
   }
+
   50% {
     opacity: 0.4;
   }
@@ -71,6 +74,7 @@ body {
     opacity: 0;
     transform: translateY(6px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -623,5 +627,36 @@ input[type="range"]::-webkit-slider-thumb:hover {
   .capture-btn {
     width: 64px;
     height: 64px;
+  }
+}
+
+.model-loading-bar {
+  height: 3px;
+  background: rgba(255, 255, 255, 0.15);
+  width: 100%;
+  overflow: hidden;
+}
+
+.model-loading-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #10b981, #34d399);
+  transition: width 0.4s ease;
+  border-radius: 0 2px 2px 0;
+}
+
+.status-dot.loading {
+  background: #fbbf24;
+  animation: pulse-dot 1.2s ease-in-out infinite;
+}
+
+@keyframes pulse-dot {
+
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.3;
   }
 }
