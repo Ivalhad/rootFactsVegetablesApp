@@ -1,3 +1,4 @@
+import { pipeline } from '@huggingface/transformers';
 import { TONE_CONFIG } from '../utils/config.js';
 
 export class RootFactsService {
