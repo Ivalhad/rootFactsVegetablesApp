@@ -1,1 +1,1 @@
-APP_URL=
+APP_URL=https://gleeful-elf-394760.netlify.app
