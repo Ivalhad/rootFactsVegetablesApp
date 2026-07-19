@@ -29,7 +29,6 @@ function App() {
       servicesRef.current = { detector, camera, generator };
       actions.setServices({ detector, camera, generator });
       try {
-        // Load model TensorFlow dulu
         await detector.loadModel((text, pct) => {
           actions.setModelStatus(`${text}${pct < 100 ? ` ${pct}%` : ''}`);
         });
@@ -72,6 +71,10 @@ function App() {
 
             actions.setAppState('result');
             actions.setFunFactData(null);
+            isRunningRef.current = false;
+            actions.setRunning(false);
+            if (camera) camera.stopCamera();
+
             try {
               const fact = await generator.generateFacts(result.className);
               actions.setFunFactData(fact || 'fakta tidak tersedia.');
@@ -79,9 +82,7 @@ function App() {
               actions.setFunFactData('error');
             }
 
-            await new Promise((r) => setTimeout(r, APP_CONFIG.factsGenerationDelay));
-            if (!isRunningRef.current) return;
-            actions.resetResults();
+            return;
           }
         }
 

@@ -62,10 +62,10 @@ export class RootFactsService {
 
   #buildPrompt(vegetableName) {
     const prompts = {
-      normal: `Write one interesting fun fact about ${vegetableName} in 2-3 sentences.`,
-      funny: `Write one hilariously funny and silly fun fact about ${vegetableName} in 2-3 sentences.`,
-      professional: `Write one scientific and formal fun fact about ${vegetableName} for educational purposes in 2-3 sentences.`,
-      casual: `Write one casual and friendly fun fact about ${vegetableName} as if talking to a friend in 2-3 sentences.`,
+      normal: `Provide exactly one true and interesting fact specifically about the vegetable ${vegetableName}. Do not talk about anything else.`,
+      funny: `Provide exactly one true and hilarious fact specifically about the vegetable ${vegetableName}. Do not talk about anything else.`,
+      professional: `Provide exactly one true and scientific fact specifically about the vegetable ${vegetableName}. Do not talk about anything else.`,
+      casual: `Provide exactly one true and casual fact specifically about the vegetable ${vegetableName}. Do not talk about anything else.`,
     };
     return prompts[this.currentTone] || prompts.normal;
   }
@@ -80,8 +80,8 @@ export class RootFactsService {
       const prompt = this.#buildPrompt(vegetableName);
       const output = await this.generator(prompt, {
         max_new_tokens: 150,
-        temperature: 0.9,
-        top_p: 0.95,
+        temperature: 0.3,
+        top_p: 0.8,
         do_sample: true,
       });
       return output[0]?.generated_text || null;
